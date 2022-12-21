@@ -1,4 +1,3 @@
-
 ([[
                 This script has been licensed using Luauth
             Unauthorized distribution of this script is forbidden.
