@@ -1,0 +1,1850 @@
+local Modules = loadstring(game:HttpGet("https://raw.githubusercontent.com/v2bNugget/Script-Modules/main/Alone%20Systems"))()
+local Icons = Modules.Icons
+
+local tp_tween = nil
+local tping = false
+local hl = nil
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+function tp(destination)
+	if tping and tp_tween then
+		tp_tween:Cancel()
+		tping = false
+	end
+	if hl then
+		hl:Disconnect()
+	end
+
+	hl = game:GetService('RunService').Stepped:Connect(d)
+
+	local toTp = LocalPlayer.Character:WaitForChild("HumanoidRootPart", math.huge)
+	tping = true
+	local TweenService = game:GetService("TweenService")
+	local Distance = (toTp.CFrame.Position - destination.Position).Magnitude
+	local Time = Distance / tonumber(Modules.scriptSettings.blocksPerSecond)
+	local Tween = TweenService:Create(toTp, TweenInfo.new(Time, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {CFrame = destination})
+	tp_tween = Tween
+	Tween:Play()
+	Tween.Completed:Connect(function()
+		tping = false
+		tp_tween = nil
+		hl:Disconnect()
+		return Tween
+	end)
+end
+
+local Modules = loadstring(game:HttpGet("https://raw.githubusercontent.com/v2bNugget/Script-Modules/main/Alone%20Systems"))()
+local Icons = Modules.Icons
+local Remotes = Modules.Remotes
+local Request = request or http_request or syn and syn.request
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
+local tween = game:GetService("TweenService")
+local WildernessBlocks = workspace.WildernessBlocks
+local WildernessIsland = workspace.WildernessIsland
+local RemotesStorage = ReplicatedStorage["rbxts_include"]["node_modules"]["@rbxts"].net.out["_NetManaged"]
+local BlockPlaceFunction = RemotesStorage.CLIENT_BLOCK_PLACE_REQUEST
+local SwingSickleFunction = RemotesStorage.SwingSickle
+local HarvestCropFunction = RemotesStorage.CLIENT_HARVEST_CROP_REQUEST
+local BlockHitFunction = RemotesStorage.CLIENT_BLOCK_HIT_REQUEST
+local ToolPickUpFunction = RemotesStorage.CLIENT_TOOL_PICKUP_REQUEST
+local PlayerIsland = nil
+for _, Island in ipairs(workspace.Islands:GetChildren()) do
+	if Island.Owners:FindFirstChild(tostring(LocalPlayer.UserId)) then
+		PlayerIsland = Island
+	end
+end
+game:GetService("Players").LocalPlayer.Idled:connect(function()
+	VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+	task.wait(0.5)
+	VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+local Window = Rayfield:CreateWindow({
+	Name = "Byte Systems | Islands Free Version (TWEEN)",
+	LoadingTitle = "Byte Systems Hub",
+	LoadingSubtitle = "Ui by Sirius",
+	ConfigurationSaving = {
+	   Enabled = false,
+	   FolderName = "Byte Systems", -- Create a custom folder for your hub/game
+	   FileName = "Byte Hub"
+	},
+	Discord = {
+	   Enabled = false,
+	   Invite = "zolo", -- The Discord invite code, do not include discord.gg/
+	   RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+	},
+	KeySystem = true, -- Set this to true to use our key system
+	KeySettings = {
+	   Title = "Byte Systems",
+	   Subtitle = "Key System",
+	   Note = "Join the discord (discord.gg/zolo)",
+	   FileName = "Byte_Keys",
+	   SaveKey = true,
+	   GrabKeyFromSite = true, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+	   Key = "FreeTheGame" --- ehfE6Yxj pastebin access
+	}
+})
+local HomePage = Window:CreateTab("Home")
+local FarmingPage = Window:CreateTab("Farming")
+local MachineryPage = Window:CreateTab("Machinery")
+local TeleportsPage = Window:CreateTab("Teleports")
+local BlockPrinter = Window:CreateTab("Block Printer")
+local SettingsPage = Window:CreateTab("Settings")
+-- Sections
+
+-- Home Page
+-- local UpdateNotesSection = HomePage:CreateSection("Update Notes (3/12/2022)")
+-- local CreditsSection = HomePage:CreateSection("Credits")
+-- local CoolDonatorsSection = HomePage:CreateSection("Cool Donators")
+-- local EliteDonatorsSection = HomePage:CreateSection("Elite Donators")
+-- local PartnerSection = HomePage:CreateSection("Script Partners")
+
+-- -- Farming Page
+-- local CropFarmSection = FarmingPage:CreateSection("Crop Farm (V1)")
+-- local OreFarmSection = FarmingPage:CreateSection("Ore Farm")
+-- local WoodFarmSection = FarmingPage:CreateSection("Wood Farm")
+-- local FlowersSection = FarmingPage:CreateSection("Flower Farm")
+-- local FruitTreesSection = FarmingPage:CreateSection("Fruit Trees")
+-- local TotemUpgradeSection = FarmingPage:CreateSection("Totem Upgrades")
+
+
+-- -- Machinery Page
+-- local SmeltingSection = MachineryPage:CreateSection("Smelting")
+-- local Composting = MachineryPage:CreateSection("Smelting")
+-- local WoodCutting = MachineryPage:CreateSection("Wood Cutting")
+
+-- -- Teleports Page
+-- local TeleportsSection = TeleportsPage:CreateSection("Teleports")
+
+-- -- Miscellaneous Page
+-- local ServerHopSection = MiscPage:CreateSection("Server Hop")
+-- local AutoSection = MiscPage:CreateSection("Auto Sell Items")
+-- local ChestSection = MiscPage:CreateSection("Chests")
+-- local MiscSection = MiscPage:CreateSection("Misc")
+-- local DestroySection = MiscPage:CreateSection("Destroy Blocks")
+-- local FreeSection = MiscPage:CreateSection("Thank Island Devs<3")
+
+if not PlayerIsland then
+	local Button = HomePage:CreateButton({
+		Name = "Island Not Found, Some Features Might Not Work!",
+		Callback = function()
+
+		end,
+	 })
+end
+
+-- Update Notes Section
+task.wait(NewUITime)
+
+local Button = HomePage:CreateButton({
+	Name = "Last Updated: (13/2/23)",
+	Callback = function()
+        print("last update check: 13/2/23")
+	end,
+})
+
+local Button = HomePage:CreateButton({
+	Name = "Brought to you by Byte Systems",
+	Callback = function()
+
+	end,
+})
+local Button = HomePage:CreateButton({
+	Name = "Anti-Afk Is Always On",
+	Callback = function()   
+		
+	end,
+})
+local Button = HomePage:CreateButton({
+	Name = "Some Features May Not Work Due to First Release",
+	Callback = function()
+		print("This Feature I Don't know Myself I forgot")
+	end,
+})
+local Button = HomePage:CreateButton({
+	Name = "Anti-Afk Is Always On",
+	Callback = function()
+		
+	end,
+})
+
+task.wait(NewUITime)
+local CreditsSection = HomePage:CreateSection("Credits")
+
+-- Credits Section
+
+local Button = HomePage:CreateButton({
+	Name = "Click To Join Our Discord Server",
+	Callback = function()
+		Request({
+			Url = "http://127.0.0.1:6463/rpc?v=1",
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json",
+				["Origin"] = "https://discord.com"
+			},
+			Body = HttpService:JSONEncode({
+				cmd = "INVITE_BROWSER",
+				args = {
+					code = "lottery",
+				},
+				nonce = HttpService:GenerateGUID(false)
+			}),
+		})
+	end,
+})
+
+local Button = HomePage:CreateButton({
+	Name = "Founder: Blunt#7843",
+	Callback = function()
+	-- The function that takes place when the button is pressed
+	end,
+})
+
+local Button = HomePage:CreateButton({
+	Name = "Co Founder: Rizve#3400",
+	Callback = function()
+	-- The function that takes place when the button is pressed
+	end,
+})
+
+local Button = HomePage:CreateButton({
+	Name = "Helpers: W41K3R#0363 & vxnt#0493",
+	Callback = function()
+	-- The function that takes place when the button is pressed
+	end,
+})
+
+task.wait(NewUITime)
+local CoolDonatorsSection = HomePage:CreateSection("Cool Donators")
+
+-- Cool Donators Section
+
+local Button = HomePage:CreateButton({
+	Name = "To be Cool: Donate $5 or more!",
+	Callback = function()
+	-- The function that takes place when the button is pressed
+	end,
+})
+
+local EliteDonatorsSection = HomePage:CreateSection("Elite Donators")
+
+-- Elite Donators Section
+
+local Button = HomePage:CreateButton({
+	Name = "To be Elite: Donate $25 or more!",
+	Callback = function()
+	-- The function that takes place when the button is pressed
+	end,
+})
+
+task.wait(NewUITime)
+local PartnerSection = HomePage:CreateSection("Script Partners")
+local Button = HomePage:CreateButton({
+	Name = "Click To Join Our Partner: System Exodus",
+	Callback = function()
+		Request({
+			Url = "http://127.0.0.1:6463/rpc?v=1",
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json",
+				["Origin"] = "https://discord.com"
+			},
+			Body = HttpService:JSONEncode({
+				cmd = "INVITE_BROWSER",
+				args = {
+					code = "systemexodus",
+				},
+				nonce = HttpService:GenerateGUID(false)
+			}),
+		})
+	end,
+})
+local Button = HomePage:CreateButton({
+	Name = "Click To Join Our Partner: Project Z",
+	Callback = function()
+		Request({
+			Url = "http://127.0.0.1:6463/rpc?v=1",
+			Method = "POST",
+			Headers = {
+				["Content-Type"] = "application/json",
+				["Origin"] = "https://discord.com"
+			},
+			Body = HttpService:JSONEncode({
+				cmd = "INVITE_BROWSER",
+				args = {
+					code = "r6RX9hSjkh",
+				},
+				nonce = HttpService:GenerateGUID(false)
+			}),
+		})
+	end,
+})
+
+local Button = HomePage:CreateButton({
+   Name = "Click Join Our Partner: RoFlux",
+   Callback = function()
+	Request({
+		Url = "http://127.0.0.1:6463/rpc?v=1",
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json",
+			["Origin"] = "https://discord.com"
+		},
+		Body = HttpService:JSONEncode({
+			cmd = "INVITE_BROWSER",
+			args = {
+				code = "kRCBpCENdP",
+			},
+			nonce = HttpService:GenerateGUID(false)
+		}),
+	})
+   end,
+})
+
+local CropFarmSection = FarmingPage:CreateSection("Crop Farm (V1)")
+
+-- Farming Page
+
+-- Crop Farm Section
+
+local selectedCrop = nil
+local Dropdown = FarmingPage:CreateDropdown({
+   Name = "Select Crop",
+   Options = {"Wheat", "Radish", "Onion", "Carrot", "Watermelon", "Pumpkin", "Spinach", "Tomato", "Potato", "Pineapple", "Grape", "Dragon Fruit", "Berry Bush"},
+   CurrentOption = "",
+   Flag = "1jhxzbchbu", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Crop)
+	local NewCropName = Crop
+
+	if Crop == "Watermelon" then
+		NewCropName = "melon"
+	end
+
+	selectedCrop = tostring(NewCropName):lower()
+   end,
+})
+local cropFarm = nil
+local Toggle = FarmingPage:CreateToggle({
+   Name = "Crop Farm",
+   CurrentValue = false,
+   Flag = "xhjiniujdfsuijndunisuinuindsuinuidnsunidscuncdsnuicdsnuiunicds23882828282", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(bool)
+	cropFarm = bool
+   end
+})
+
+local Button = FarmingPage:CreateButton({
+   Name = "Sickle toggle will randomly disable for performance!"
+})
+local useSickle = true
+local Toggle = FarmingPage:CreateToggle({
+   Name = "Use Sickle (Sickle Not Required, Faster)",
+   CurrentValue = true,
+   Flag = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaalllllllllllllllllllllllllllllllll", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(bool)
+		useSickle = bool
+   end,
+})
+local replaceSeeds = true
+
+local Toggle = FarmingPage:CreateToggle({
+   Name = "Replace seeds",
+   CurrentValue = true,
+   Flag = "15465441154x154xcz854154xc1xcz1x1c8z8xcz8zxc187cdzhbucdnuihdsni", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(bool)
+	replaceSeeds = bool
+   end,
+})
+task.spawn(function()
+	task.spawn(function()
+		while task.wait() do
+			if cropFarm and selectedCrop then
+				local num = math.random(1, 6)
+				if num == 3 and sickleToggle then
+					CropFarmSection:updateToggle(sickleToggle, "Use Sickle (Sickle Not Required. Faster)", false)
+					useSickle = false
+					wait(math.random(1, 2))
+					CropFarmSection:updateToggle(sickleToggle, "Use Sickle (Sickle Not Required. Faster)", true)
+					useSickle = true
+				end
+				wait(0.85)
+			end
+		end
+	end)
+
+	while task.wait() do
+		if cropFarm and selectedCrop then
+			local HumanoidRootPart = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+			local grownCrops = {}
+			for _, block in ipairs(PlayerIsland.Blocks:GetChildren()) do
+				if block.Name:lower() == selectedCrop and (block:FindFirstChild("stage") and tonumber(block.stage.Value) == 3) then
+					table.insert(grownCrops, block)
+				end
+			end
+			if #grownCrops >= 1 then
+				local pickableCrops = {}
+	 			for Index, Crop in next, grownCrops do -- 
+					if (HumanoidRootPart.Position - Crop.Position).Magnitude <= 18 then
+						table.insert(pickableCrops, Crop)
+					end
+				end
+				if #pickableCrops >= 1 then
+					if useSickle then
+						local totalPossibleGroups = math.floor(#pickableCrops / 7)
+						if totalPossibleGroups > 0 then
+							local pickableCropsGroups = {}
+							repeat task.wait()
+								local pickableGroup = {}
+								for offset = 0, 7 do
+									pcall(function()
+										table.insert(pickableGroup, pickableCrops[#pickableCrops - offset])
+										table.remove(pickableCrops, #pickableCrops - offset)
+									end)
+								end
+								totalPossibleGroups =- 1
+								if totalPossibleGroups >= 1 then
+									table.insert(pickableCropsGroups, pickableGroup)
+								end
+							until
+							((#pickableCropsGroups >= 1) and (totalPossibleGroups < 1 or #pickableCrops < 7)) or #pickableCrops < 5
+							pcall(function()
+								if #pickableCrops > 1 and #pickableCrops <= 7 then
+									table.insert(pickableCropsGroups, pickableCrops)
+								end
+							end)
+							for _, cropGroup in next, pickableCropsGroups do
+								task.spawn(function()
+									SwingSickleFunction:InvokeServer("sickleDiamond", cropGroup)
+									if replaceSeeds then
+										task.spawn(function()
+											for _, crop in next, cropGroup do
+												task.spawn(function()
+													BlockPlaceFunction:InvokeServer({
+														["upperBlock"] = false,
+														["cframe"] = crop.CFrame,
+														["player_tracking_category"] = "join_from_web",
+														["blockType"] = tostring(selectedCrop:lower())
+													})
+												end)
+											end
+										end)
+									end
+								end)
+								task.wait()
+							end
+						else
+							task.spawn(function()
+								SwingSickleFunction:InvokeServer("sickleDiamond", pickableCrops)
+								if replaceSeeds then
+									task.spawn(function()
+										for _, crop in next, pickableCrops do
+											task.spawn(function()
+												BlockPlaceFunction:InvokeServer({
+													["upperBlock"] = false,
+													["cframe"] = crop.CFrame,
+													["player_tracking_category"] = "join_from_web",
+													["blockType"] = tostring(selectedCrop:lower())
+												})
+											end)
+										end
+									end)
+								end
+							end)
+						end 
+					else
+						for _, crop in pickableCrops do
+							task.spawn(function()
+								HarvestCropFunction:InvokeServer({
+									["player"] = LocalPlayer,
+									["player_tracking_category"] = "join_from_web",
+									["model"] = crop
+								})
+								if replaceSeeds then
+									task.spawn(function()
+										BlockPlaceFunction:InvokeServer({
+											["upperBlock"] = false,
+											["cframe"] = crop.CFrame,
+											["player_tracking_category"] = "join_from_web",
+											["blockType"] = tostring(selectedCrop:lower())
+										})
+									end)
+								end
+
+							end)
+							task.wait()
+						end
+					end
+				else
+					local attributedCropsTable = {}
+					local distance = {}
+					for _, crop in next, grownCrops do
+						local Distance = (HumanoidRootPart.Position - crop.Position).Magnitude
+						crop:SetAttribute("Distance", tostring(Distance))
+
+						table.insert(attributedCropsTable, crop)
+						table.insert(distance, tostring(Distance))
+					end
+					local lowest = math.huge
+					for Index = 1, #distance  do
+						lowest = lowest < tonumber(distance[Index]) and lowest or tonumber(distance[Index])
+					end
+					table.foreachi(attributedCropsTable, function(Index, crop)
+						if crop:GetAttribute("Distance") and tonumber(crop:GetAttribute("Distance")) == tonumber(lowest) then
+							tp(crop.CFrame)
+						end
+					end)
+				end
+			end
+		end
+	end
+end)
+
+local OreFarmSection = FarmingPage:CreateSection("Ore Farm")
+
+local SelectedOre = nil
+local IsFarmingOres = false
+
+local Dropdown = FarmingPage:CreateDropdown({
+   Name = "Ore Farm",
+   Options = {"Stone", "Iron", "Coal", "Clay", "Gold", "Electrite", "Marble", "Diorite", "Granite", "Slate", "Sandstone", "Opal", "Obsidian"},
+   CurrentOption = "",
+   Flag = "Drop10303039487412987897321879123789dsjkfnuijnofdiju", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Ore)
+	SelectedOre = tostring(Ore):lower()
+   end,
+})
+
+
+local Toggle = FarmingPage:CreateToggle({
+   Name = "Mine Ores",
+   CurrentValue = false,
+   Flag = "Toggle541514sasdlw0w0w02jinzxfv1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Bool)
+	IsFarmingOres = Bool
+	task.spawn(function()
+		task.wait(LoopLoadingTime)
+	
+		while task.wait() do
+			if SelectedOre and IsFarmingOres and PlayerIsland and PlayerIsland.Blocks:FindFirstChild("portalToSpawn") then
+				for Index, WildernessBlock in ipairs(WildernessBlocks:GetChildren()) do
+					if WildernessBlock.Name:lower() == "rock" .. SelectedOre then
+						if not IsFarmingOres then return end
+						game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = WildernessBlock["1"].CFrame + Vector3.new(0,5,0)
+						repeat task.wait(0.1)
+							if not IsFarmingOres then return end
+							local HumanoidRootPart = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+	
+							if not SelectedOre or not IsFarmingOres then 
+								local args = {
+									[1] = {}
+								}
+								
+								RemotesStorage.client_request_5:InvokeServer(unpack(args))							
+								break 
+							end
+	
+							if WildernessBlock:FindFirstChild("1") then
+								tp(WildernessBlock["1"].CFrame + Vector3.new(0,5,0))
+							end
+	
+							task.spawn(function()
+								BlockHitFunction:InvokeServer({
+									["player_tracking_category"] = "join_from_web",
+										["part"] = WildernessBlock:FindFirstChild("1"),
+										["block"] = WildernessBlock,
+										["norm"] = Vector3.new(0, 0, 0),
+										["pos"] = Vector3.new(0, 0, 0)
+								})				
+							end)
+						until
+							not WildernessBlock or WildernessBlock.Parent ~= WildernessBlocks or not WildernessBlock.Parent
+					end
+				end
+			end
+		end
+	end)
+   end,
+})
+
+local MiningIslandOres = false
+local MineIslandOresToggle_Name
+
+
+local Toggle = FarmingPage:CreateToggle({
+   Name = "Mine Player Island Ores (Select Ore First)",
+   CurrentValue = false,
+   Flag = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPOOOOOOOOOOOOOOOOOOOOOOOOOOOjindcsvuijnvdcs", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Value)
+	MiningIslandOres = Value
+   end,
+})
+
+task.spawn(function()
+	task.wait(LoopLoadingTime)
+
+	while task.wait() do
+		if MiningIslandOres then
+			for Index, Block in ipairs(PlayerIsland.Blocks:GetChildren()) do
+				if Block.Name:lower() == "rock" .. SelectedOre then
+					repeat task.wait(0.1)
+						local HumanoidRootPart = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+
+						if not SelectedOre or not MiningIslandOres then 
+							break 
+						end
+
+						if Block:FindFirstChild("1") then
+							tp(Block['1'].CFrame + Vector3.new(0,5,0))
+						end
+
+						task.spawn(function()
+							BlockHitFunction:InvokeServer({
+								["player_tracking_category"] = "join_from_web",
+									["part"] = Block:FindFirstChild("1"),
+									["block"] = Block,
+									["norm"] = Vector3.new(0, 0, 0),
+									["pos"] = Vector3.new(0, 0, 0)
+							})				
+						end)
+					until
+						not Block or Block.Parent ~= PlayerIsland.Blocks
+				end
+			end
+		end
+	end
+end)
+
+local WoodFarmSection = FarmingPage:CreateSection("Wood Farm")
+
+local SelectedTree
+
+local Dropdown = FarmingPage:CreateDropdown({
+   Name = "Wood Selection",
+   Options = {"Oak","Birch","Spirit","Maple","Pine","Hickory","Cherry Tree"},
+   CurrentOption = "",
+   Flag = "1idc2iloveyou3iloveblunt", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(v)
+		SelectedTree = v
+   end,
+})
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Wood Farm",
+	CurrentValue = false,
+	Flag = "BluntLovesAndy", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(value)
+		getgenv().FarmTree = value
+	end,
+})
+task.spawn(function()
+        while true do
+            task.wait(0.05)
+            if FarmTree then
+                if SelectedTree == "Oak" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name == "tree1" or v.Name == "tree2" or v.Name == "tree3" or v.Name == "tree4" then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+                if SelectedTree == "Birch" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name:find("treeBirch") then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            	tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+                if SelectedTree == "Spirit" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name:find("treeSpirit") then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            	tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+                if SelectedTree == "Maple" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name:find("treeMaple") then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            	tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+                if SelectedTree == "Pine" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name:find("treePine") then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            	tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+                if SelectedTree == "Hickory" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name:find("treeHickory") then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            	tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+				if SelectedTree == "Cherry Tree" then
+                    for i, v in pairs(PlayerIsland.Blocks:GetChildren()) do
+                        if v.Name:find("treeCherry") then
+                            if FarmTree == false then
+                                return
+                            end
+                            repeat
+                            	tp(v.CFrame + Vector3.new(3,0,0))
+                                task.wait(0.05)
+                                local ohTable1 = {["block"] = v}
+                                RemotesStorage.CLIENT_BLOCK_HIT_REQUEST:InvokeServer(
+                                    ohTable1
+                                )
+                            until FarmTree == false or not v.Parent
+                        end
+                    end
+                end
+            end
+        end
+end)
+
+local FlowersSection = FarmingPage:CreateSection("Flower Farm")
+
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Water Flowers",    
+	CurrentValue = false,
+	Flag = "BluntLovesAndy10Times", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(BluntsAreGood)
+		getgenv().Water = BluntsAreGood
+		spawn(function()
+			while true do
+				if not Water then return end
+				for i,v in pairs(PlayerIsland.Blocks:GetChildren()) do
+					if v.Name:find("flower") then
+						if not Water then return end
+						tp(v.CFrame)
+						task.wait(0.25)
+						if not Water then return end
+						local ohTable1 = {["block"] = v}
+						RemotesStorage.CLIENT_WATER_BLOCK:InvokeServer(ohTable1)
+					end
+				end
+				task.wait()
+			end
+		end)
+	end,
+})
+
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Collect Non-Fertile Flowers",    
+	CurrentValue = false,
+	Flag = "BluntLovesAndy10Timesd", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(value)
+		getgenv().NonCollectFertile = value
+		spawn(function()
+			while true do
+				task.wait()
+				if not NonCollectFertile then return end
+				for i,v in pairs(PlayerIsland.Blocks:GetChildren()) do
+					if v.Name:find("flower") and not v.Name:find("Fertile") then
+						if not NonCollectFertile then return end
+						repeat task.wait()
+							tp(v.CFrame)
+							if not NonCollectFertile then return end
+							local ohTable1 = {["flower"] = v}
+							RemotesStorage.client_request_1:InvokeServer(ohTable1)
+						until not NonCollectFertile or not v.Parent
+					end
+				end
+			end
+		end)
+	end,
+})
+
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Collect Fertile Flowers",    
+	CurrentValue = false,
+	Flag = "BluntLovesAndy10Timesa", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(value)
+		getgenv().Flower1 = value
+		spawn(function()
+			while true do
+				if not Flower1 then return end
+				for i,v in pairs(PlayerIsland.Blocks:GetChildren()) do
+					if v.Name:find("Fertile") then 
+						repeat
+							tp(v.CFrame)
+							task.wait(0.01)
+							local ohTable1 = {["flower"] = v}
+							RemotesStorage.client_request_1:InvokeServer(ohTable1)
+						until Flower1 == false or not v.Parent
+					end	
+				end
+				task.wait()
+			end
+		end)
+	end,
+})
+local FruitTreesSection = FarmingPage:CreateSection("Fruit Trees")
+
+local SelectedFruitTree = nil
+
+local Dropdown = FarmingPage:CreateDropdown({
+   Name = "Select Fruit Tree",
+   Options =  {"Lemon Tree", "Apple Tree", "Coconut Tree", "Orange Tree", "Kiwi Tree","Plum Tree"},
+   CurrentOption = "",
+   Flag = "uy8bolszxmsdefionsdefndsfiosdfisdafmidfimsdimfmiosdfmiooim9492390489////", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(FruitTree)
+	SelectedFruitTree = FruitTree:split(" ")[1]:lower()
+   end,
+})
+local FarmingFruitTree = false
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Auto Collect Fruits",
+	CurrentValue = false,
+	Flag = "1458951429514225145214521452614524125", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Bool)
+		FarmingFruitTree = Bool
+	end,
+})
+task.spawn(function() 
+	task.wait(LoopLoadingTime)
+
+	while task.wait() do
+		if SelectedFruitTree and FarmingFruitTree then
+			for _, Block in ipairs(PlayerIsland.Blocks:GetChildren()) do
+				if Block.Name:lower() == "tree" .. SelectedFruitTree then
+					for i, FruitHolder in next, Block.FruitLocations:GetChildren() do
+						if FruitHolder:FindFirstChild(SelectedFruitTree) then
+							tp(FruitHolder.CFrame - Vector3.new(0, 3.5, 0))
+							task.spawn(function()
+								ToolPickUpFunction:InvokeServer({
+									["tool"] = FruitHolder[SelectedFruitTree],
+									["player_tracking_category"] = "join_from_web"
+								})
+							end)
+						end
+
+						task.wait()
+					end
+				end
+			end
+		end
+	end
+end)
+
+local TotemUpgradeSection = FarmingPage:CreateSection("Totem Upgrades")
+
+local selection
+local Dropdown = FarmingPage:CreateDropdown({
+	Name = "Select Totem",
+	Options = {"totemStone", "totemAndesite", "totemDiorite", "totemGranite", "totemCoal", "totemClay", "totemWheat", "totemIron", "totemTomato", "totemRadish", "totemMarble", "totemPotato", "totemPumpkin", "totemSlate", "totemMelon", "totemCarrot", "totemSandstone", "totemSandstoneRed", "totemPineapple", "totemOnion", "totemGrape", "totemSpinach", "totemStarfruit", "totemDragonfruit"},
+	CurrentOption = "Option 1",
+	Flag = "193197974nhijzxcuinasdiuasd", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(upgrade)
+		selection = upgrade
+	end,
+ })
+local Amount
+local utility
+local efficiency
+local quality
+local Input = FarmingPage:CreateInput({
+   Name = "Type Upgrade Amount",
+   PlaceholderText = "Amount",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(value)
+		Amount = value
+   end,
+})
+local Toggle = FarmingPage:CreateToggle({
+   Name = "Utility",
+   CurrentValue = false,
+   Flag = "yubsabyuxcsuybibuyh", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Callback = function(Bool)
+		utility = Bool
+   end,
+})
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Efficiency",
+	CurrentValue = false,
+	Flag = "yubsabyuxcsuybibuyha859461", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Bool)
+		efficiency = Bool
+	end,
+})
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Quality",
+	CurrentValue = false,
+	Flag = "yubsabyuxcsuybibuyh894sxazuidfuni888", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Bool)
+		quality = Bool
+	end,
+})
+local upgradeTotem = false
+local Toggle = FarmingPage:CreateToggle({
+	Name = "Start Upgrading",
+	CurrentValue = false,
+	Flag = "tgysadytvsaxTYVDSCTGVSAYTVUSAYUGTSTYAG79825295847", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Bool)
+		upgradeTotem = Bool
+		spawn(function()
+			while true do
+				task.wait()
+				if not upgradeTotem then return end
+				for i,v in pairs(PlayerIsland.Blocks:GetChildren()) do
+					if v.Name == selection then
+						if efficiency == true then
+							local ohInstance1 = v
+							if selection == "totemStone" or selection == "totemAndesite" or selection == "totemDiorite" or selection == "totemGranite" or selection == "totemCoal" or selection == "totemClay" or selection == "totemIron" or selection == "totemMarble" or selection == "totemSlate" or selection == "totemSandstone" or selection == "totemSandstoneRed" then
+								ohString2 = "totem_rock"
+							elseif selection == "totemWheat" or selection == "totemTomato" or selection == "totemRadish" or selection ==  "totemPotato" or selection == "totemPumpkin" or selection == "totemMelon" or selection == "totemCarrot" or selection == "totemPineapple" or selection == "totemOnion" or selection == "totemGrape" or selection == "totemSpinach" or selection == "totemStarfruit" or selection == "totemDragonfruit" then
+								ohString2 = "totem_crop"
+							end
+							local ohString3 = "efficiency"
+							RemotesStorage.UpgradeBlock:InvokeServer(ohInstance1, ohString2, ohString3)
+						elseif utility == true then
+							local ohInstance1 = v
+							if selection == "totemStone" or selection == "totemAndesite" or selection == "totemDiorite" or selection == "totemGranite" or selection == "totemCoal" or selection == "totemClay" or selection == "totemIron" or selection == "totemMarble" or selection == "totemSlate" or selection == "totemSandstone" or selection == "totemSandstoneRed" then
+								ohString2 = "totem_rock"
+							elseif selection == "totemWheat" or selection == "totemTomato" or selection == "totemRadish" or selection ==  "totemPotato" or selection == "totemPumpkin" or selection == "totemMelon" or selection == "totemCarrot" or selection == "totemPineapple" or selection == "totemOnion" or selection == "totemGrape" or selection == "totemSpinach" or selection == "totemStarfruit" or selection == "totemDragonfruit" then
+								ohString2 = "totem_crop"
+							end
+							local ohString3 = "utility"
+							RemotesStorage.UpgradeBlock:InvokeServer(ohInstance1, ohString2, ohString3)
+						elseif quality == true then
+							local ohInstance1 = v
+							if selection == "totemStone" or selection == "totemAndesite" or selection == "totemDiorite" or selection == "totemGranite" or selection == "totemCoal" or selection == "totemClay" or selection == "totemIron" or selection == "totemMarble" or selection == "totemSlate" or selection == "totemSandstone" or selection == "totemSandstoneRed" then
+								ohString2 = "totem_rock"
+							elseif selection == "totemWheat" or selection == "totemTomato" or selection == "totemRadish" or selection ==  "totemPotato" or selection == "totemPumpkin" or selection == "totemMelon" or selection == "totemCarrot" or selection == "totemPineapple" or selection == "totemOnion" or selection == "totemGrape" or selection == "totemSpinach" or selection == "totemStarfruit" or selection == "totemDragonfruit" then
+								ohString2 = "totem_crop"
+							end
+							local ohString3 = "quality"
+							RemotesStorage.UpgradeBlock:InvokeServer(ohInstance1, ohString2, ohString3)
+						end
+					end
+				end
+			end
+		end)
+	end,
+})
+
+local SmeltingSection = MachineryPage:CreateSection("Smelting")
+
+local Dropdown = MachineryPage:CreateDropdown({
+	Name = "Select Ore",
+	Options = {"Gold Ore", "Iron Ore", "Copper Ore", "Steel Ore"},
+	CurrentOption = "",
+	Flag = "dhsunubnixzcuihduhdcuhx",
+	Callback = function(Ore)
+		getgenv().Machinery_Ore = Ore
+	end,
+})
+local Dropdown = MachineryPage:CreateDropdown({
+	Name = "Select Smelter",
+	Options = {"smallFurnace", "Campfire"},
+	CurrentOption = "",
+	Flag = "uihnxsuhxcuhicxuihuhixcduhisdcuihdsfcuincdsuihdsfcuiduihs",
+	Callback = function(Smelter)
+		getgenv().Machinery_Smelter = Smelter
+	end,
+})
+local Slider = MachineryPage:CreateSlider({
+	Name = 'Amount of Coal',
+	Range = {1,5},
+	Increment = 1,
+	Suffix = "Coal",
+	CurrentValue = 1,
+	Flag = "Slider1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(value)
+		getgenv().AmountOfCoalEachSmelter = value
+	end,
+})
+local Slider = MachineryPage:CreateSlider({
+	Name = 'Amount of Ore',
+	Range = {1,10},
+	Increment = 1,
+	Suffix = "Ore",
+	CurrentValue = 1,
+	Flag = "Slider1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(value)
+		getgenv().AmountOfOreEachSmelter = value
+	end,
+})
+local Toggle = MachineryPage:CreateToggle({
+	Name = "Auto Smelt",
+	CurrentValue = false,
+	Flag = "gbudsfybfdsyuhdsfyuyuhdsyuh", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().Machinery_SmeltingToggle = Value
+
+
+		local Island
+	
+		for i, island in pairs(game:GetService("Workspace").Islands:GetChildren()) do	
+			if island:FindFirstChild("Owners") and island.Owners:FindFirstChild(game:GetService("Players").LocalPlayer.UserId) then
+				Island = island
+			end
+		end
+	
+		local Blocks = Island.Blocks
+	
+		local function GetAmoutOfItem(ItemName)
+			local Player = game:GetService("Players").LocalPlayer
+			local Backpack = Player.Backpack
+	
+			if Backpack:FindFirstChild(ItemName) then
+				return Backpack[ItemName].Amount.Value
+			elseif Player.Character:FindFirstChild(ItemName) then
+				return Player.Character[ItemName].Amount.Value
+			else
+				return 0
+			end
+		end
+	
+		for i, Block in ipairs(Blocks:GetChildren()) do
+			if Block.Name:lower() == tostring(getgenv().Machinery_Smelter):lower() then
+				local WorkerContents = Block.WorkerContents
+				local Fuels = Block.WorkerFuel
+				local Finished = Block.WorkerOutputContents
+				task.spawn(function()
+					while tostring(getgenv().Machinery_Smelter):lower() == Block.Name:lower() and getgenv().Machinery_SmeltingToggle and task.wait() do
+						local Split = getgenv().Machinery_Ore:split(" ")
+						local OreName = Split[1]:lower() .. Split[2]
+	
+						if #Finished:GetChildren() >= 1 then
+							tp(Finished.Parent.CFrame+Vector3.new(0,4,0))
+							for i, Output in pairs(Finished:GetChildren()) do
+								local PickupSettings = {
+									["tool"] = Output,
+									["player_tracking_category"] = "join_from_web"
+								}
+								RemotesStorage.CLIENT_TOOL_PICKUP_REQUEST:InvokeServer(PickupSettings)
+							end
+						end
+						if #WorkerContents:GetChildren() < 1 then
+							if GetAmoutOfItem(OreName) >= 1 then
+								local Setting = {
+									["amount"] = tonumber(getgenv().AmountOfOreEachSmelter) or 1,
+									["block"] = Block,
+									["player_tracking_category"] = "join_from_web",
+									["toolName"] = OreName
+								}
+	
+								RemotesStorage.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer(Setting)
+							else
+								venyx:Notify("Error", "Not Enough " .. tostring(getgenv().Machinery_Ore) .. "s")
+								return
+							end
+						end
+						if #Fuels:GetChildren() < 1 then
+							if GetAmoutOfItem("coal") >= 1 then
+								local Setting = {
+									["amount"] = tonumber(getgenv().AmountOfCoalEachSmelter) or 1,
+									["block"] = Block,
+									["player_tracking_category"] = "join_from_web",
+									["toolName"] = "coal"
+								}
+	
+								RemotesStorage.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer(Setting)
+							else
+								venyx:Notify("Error", "Not Enough Coals")
+								return
+							end
+						end
+					end
+				end)
+			end
+		end
+	end,
+ })
+
+local Composting = MachineryPage:CreateSection("Composting")
+getgenv().Machinery_Fish = "";
+local Dropdown = MachineryPage:CreateDropdown({
+	Name = "Select Fish",
+	Options = {"fishSalmon", "fishCarp", "fishRedSnapper", "fishGrouper", "fishCatfish", "fishTuna", "fishTrout", "fishTalapia"},
+	CurrentOption = '',
+	Flag = "hnjuchnchuncuhyncxhuxchyuxc",
+	Callback = function(fish)
+		getgenv().Machinery_Fish = fish
+	end,
+})
+getgenv().Machinery_composting = false
+local Toggle = MachineryPage:CreateToggle({
+	Name = "Auto Compos",
+	CurrentValue = false,
+	Flag = "llllejerjejejjdjcfxziujbunivdsuijnsdviun",
+	Callback = function(Value)
+		getgenv().Machinery_Composting = Value
+		local Island
+	
+		for i, island in pairs(game:GetService("Workspace").Islands:GetChildren()) do	
+			if island:FindFirstChild("Owners") and island.Owners:FindFirstChild(game:GetService("Players").LocalPlayer.UserId) then
+				Island = island
+			end
+		end
+	
+		local Blocks = Island.Blocks
+	
+		local function GetAmoutOfItem(ItemName)
+			local Player = game:GetService("Players").LocalPlayer
+			local Backpack = Player.Backpack
+	
+			if Backpack:FindFirstChild(ItemName) then
+				return Backpack[ItemName].Amount.Value
+			elseif Player.Character:FindFirstChild(ItemName) then
+				return Player.Character[ItemName].Amount.Value
+			else
+				return 0
+			end
+		end
+	
+		for i, Block in ipairs(Blocks:GetChildren()) do
+			if Block.Name:lower() == "composter" then
+				local WorkerContents = Block.WorkerContents
+				local Fuels = Block.WorkerFuel
+				local Finished = Block.WorkerOutputContents
+				task.spawn(function()
+					while getgenv().Machinery_Composting and task.wait() do
+						local FishName = getgenv().Machinery_Fish
+						if #Finished:GetChildren() >= 1 then
+							tp(Finished.Parent.CFrame + Vector3.new(0,4,0))
+							for i, Output in pairs(Finished:GetChildren()) do
+								local PickupSettings = {
+									["tool"] = Output,
+									["player_tracking_category"] = "join_from_web"
+								}
+								RemotesStorage.CLIENT_TOOL_PICKUP_REQUEST:InvokeServer(PickupSettings)
+							end
+						end
+						if #WorkerContents:GetChildren() < 1 then
+							if GetAmoutOfItem(FishName) >= 1 then
+								local Setting = {
+									["amount"] = 1,
+									["block"] = Block,
+									["player_tracking_category"] = "join_from_web",
+									["toolName"] = FishName
+								}
+	
+								RemotesStorage.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer(Setting)
+							else
+								venyx:Notify("Error", "Not Enough " .. tostring(getgenv().Machinery_Fish) .. "s")
+								return
+							end
+						end
+					end
+				end)
+			end
+		end
+	end,
+})
+
+
+local WoodCutting = MachineryPage:CreateSection("Wood Cutting")
+----cutter----
+getgenv().Machinery_Wood = "";
+getgenv().AmountOfCoalEachSawmill = 0;
+getgenv().AmountOfWoodEachSawmill = 0;
+getgenv().Machinery_sawmilltog = false;
+local Dropdown = MachineryPage:CreateDropdown({
+	Name = "Select Wood",
+	Options = {"wood", "woodBirch", "woodHickory", "woodSpirit", "woodMaple", "woodPine"},
+	CurrentOption = "",
+	Flag = "iubdsfudscfunidscvuidcsuinuindcsun",
+	Callback = function(wood)
+		getgenv().Machinery_Wood = wood
+	end,
+})
+local Slider = MachineryPage:CreateSlider({
+	Name = "Amount of Coal",
+	Range = {1,5},
+	Increment = 1,
+	Suffix = "Coal",
+	CurrentValue = 2,
+	Flag = "Slider11000200218382173njld",
+	Callback = function(value)
+		getgenv().AmountOfCoalEachSawmill = value
+	end,
+})
+local Slider = MachineryPage:CreateSlider({
+	Name = 'Amount of Wood',
+	Range = {1, 10},
+	Increment = 1,
+	Suffix = "Wood",
+	CurrentValue = 5,
+	Flag = "29393298812slider",
+	Callback = function(value)
+		getgenv().AmountOfWoodEachSawmill = value
+	end,
+})
+getgenv().Machinery_sawmilltog = false
+local Toggle = MachineryPage:CreateToggle({
+	Name = "Auto Sawmill",
+	CurrentValue = false,
+	Flag = "Toggle541514sasdlw0w0w02jinzxfv1zd", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(Value)
+		getgenv().Machinery_sawmilltog = Value
+		local Island
+		for i, island in pairs(game:GetService("Workspace").Islands:GetChildren()) do	
+			if island:FindFirstChild("Owners") and island.Owners:FindFirstChild(game:GetService("Players").LocalPlayer.UserId) then
+				Island = island
+			end
+		end
+	
+		local Blocks = Island.Blocks
+	
+		local function GetAmoutOfItem(ItemName)
+			local Player = game:GetService("Players").LocalPlayer
+			local Backpack = Player.Backpack
+	
+			if Backpack:FindFirstChild(ItemName) then
+				return Backpack[ItemName].Amount.Value
+			elseif Player.Character:FindFirstChild(ItemName) then
+				return Player.Character[ItemName].Amount.Value
+			else
+				return 0
+			end
+		end
+	
+		for i, Block in ipairs(Blocks:GetChildren()) do
+			if Block.Name:lower() == "sawmill" then
+				local WorkerContents = Block.WorkerContents
+				local Fuels = Block.WorkerFuel
+				local Finished = Block.WorkerOutputContents
+				task.spawn(function()
+					while getgenv().Machinery_sawmilltog and task.wait() do
+						local WoodName = getgenv().Machinery_Wood
+	
+						if #Finished:GetChildren() >= 1 then
+							tp(Finished.Parent.CFrame + Vector3.new(0,5,0))
+							for i, Output in pairs(Finished:GetChildren()) do
+								local PickupSettings = {
+									["tool"] = Output,
+									["player_tracking_category"] = "join_from_web"
+								}
+								RemotesStorage.CLIENT_TOOL_PICKUP_REQUEST:InvokeServer(PickupSettings)
+							end
+						end
+						if #WorkerContents:GetChildren() < 1 then
+							if GetAmoutOfItem(WoodName) >= 1 then
+								local Setting = {
+									["amount"] = tonumber(getgenv().AmountOfWoodEachSawmill) or 1,
+									["block"] = Block,
+									["player_tracking_category"] = "join_from_web",
+									["toolName"] = WoodName
+								}
+	
+								RemotesStorage.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer(Setting)
+							else
+								venyx:Notify("Error", "Not Enough " .. tostring(getgenv().Machinery_Wood) .. "s")
+								return
+							end
+						end
+						if #Fuels:GetChildren() < 1 then
+							if GetAmoutOfItem("coal") >= 1 then
+								local Setting = {
+									["amount"] = tonumber(getgenv().AmountOfCoalEachSawmill) or 1,
+									["block"] = Block,
+									["player_tracking_category"] = "join_from_web",
+									["toolName"] = "coal"
+								}
+	
+								RemotesStorage.CLIENT_BLOCK_WORKER_DEPOSIT_TOOL_REQUEST:InvokeServer(Setting)
+							else
+								venyx:Notify("Error", "Not Enough Coals")
+								return
+							end
+						end
+					end
+				end)
+			end
+		end
+	end,
+})
+-- Teleport Page 
+
+local Button = TeleportsPage:CreateButton({
+    Name = "Hub Islands",
+    Callback = function()
+     game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = PlayerIsland.Blocks.portalToSpawn.Frame.CFrame
+    end,
+})
+
+local Button = TeleportsPage:CreateButton({
+    Name = "Slime Island",
+    Callback = function()
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(151.906, 30.0145, -734.674)
+    end,
+})
+
+local Button = TeleportsPage:CreateButton({
+    Name = "Spirit Island",
+    Callback = function()
+     game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(655.394, 177.853, -134.826)
+    end,
+})
+
+local Button = TeleportsPage:CreateButton({
+    Name = "Buffalkor Island",
+    Callback = function()
+     game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(885.671, 173.853, 24.1171)
+    end,
+})
+ 
+local Button = TeleportsPage:CreateButton({
+    Name = "Kor Island",
+    Callback = function()
+     game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1578.18, 207.697, 106.508)
+    end,
+})
+
+local Button = TeleportsPage:CreateButton({
+	Name = "Wizard Island",
+	Callback = function()
+		game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1134.13, 278.328, -1738.03)
+	end,
+})
+
+local Button = TeleportsPage:CreateButton({
+	Name = "Desert Island",
+	Callback = function()
+		game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1474.51, 335.059, -875.723)
+	end,
+ })
+
+local Button = TeleportsPage:CreateButton({
+	Name = "Underworld Island",
+	Callback = function()
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-8223, 285, -649)
+	end,
+})
+
+-- Block Printer Page here
+
+local Container = Instance.new("Model", game:GetService("Workspace").Entities)
+Container.Name = "Block Printer Container"
+local SelectionBox = Instance.new("SelectionBox", game:GetService("Workspace").Entities) 
+SelectionBox.Color3 = Color3.fromRGB(20, 160, 255)
+SelectionBox.LineThickness = 0.15
+SelectionBox.Adornee = Container
+
+local SectionStatus = BlockPrinter:CreateSection("Block Printing Status")
+
+local SelectedBlock = BlockPrinter:CreateButton({
+    Name = "Selected Block: N/A",
+    Callback = function()
+    -- The function that takes place when the button is pressed
+    end,
+})
+local TotalBlocksNeeded = BlockPrinter:CreateButton({
+    Name = "Total Blocks Needed: N/A",
+    Callback = function()
+    -- The function that takes place when the button is pressed
+    end,
+})
+local TotalBlocksLeft = BlockPrinter:CreateButton({
+    Name = "Total Blocks Left: N/A",
+    Callback = function()
+    -- The function that takes place when the button is pressed
+    end,
+})
+local EstimatedPrintingTime = BlockPrinter:CreateButton({
+    Name = "Estimated Printing Time: N/A",
+    Callback = function()
+    -- The function that takes place when the button is pressed
+    end,
+})
+local Section = BlockPrinter:CreateSection("Islands Block Printing")
+local function GetBlockFromPlayer(Block)
+	local lp = game:GetService("Players").LocalPlayer
+	for _, tool in ipairs(lp.Backpack:GetChildren()) do
+		if tool.Name:lower() == Block.Name:lower() then
+			local clonedtool = tool:Clone()
+			clonedtool.Parent = game:GetService("ReplicatedStorage")
+			task.spawn(function()
+				task.wait(60)
+				clonedtool:Destroy()
+			end)
+			return clonedtool
+		end
+	end
+	for _, thing in ipairs(lp.Character:GetChildren()) do
+		if thing.Name:lower() == Block.Name:lower() then
+			local clonedtool = thing:Clone()
+			clonedtool.Parent = game:GetService("ReplicatedStorage")
+			task.spawn(function()
+				task.wait(120)
+				clonedtool:Destroy()
+			end)
+			return clonedtool
+		end
+	end
+end
+local function GetBlockFromPosition(Position)
+	local Islands = game:GetService("Workspace").Islands
+	for _, Desandent in ipairs(Islands:GetDescendants()) do
+		if Desandent.Parent.Name == "Blocks" and Desandent.Position == Position then
+			return Desandent
+		end
+	end
+end
+local Rawmetatable = getrawmetatable(game)
+setreadonly(Rawmetatable, false)
+
+local OldNamecall = Rawmetatable.__namecall
+
+Rawmetatable.__namecall = newcclosure(function(self, ...)
+	local Method = getnamecallmethod()
+
+	if tostring(self) == "CLIENT_BLOCK_PLACE_REQUEST" and tostring(Method) == "InvokeServer" then
+		local Table = ...
+		task.spawn(function()
+			local BlockPosition = Table.cframe.Position
+
+			if getgenv().LookingForStartBlock then
+				getgenv().LookingForStartBlock = false
+				local Block = GetBlockFromPosition(BlockPosition)
+				getgenv().StartBlock = Block
+				getgenv().SelectedBlock = GetBlockFromPlayer(Block)
+			end
+			if getgenv().LookingForEndBlock then
+				getgenv().LookingForEndBlock = false
+				local Block = GetBlockFromPosition(BlockPosition)
+				getgenv().EndBlock = Block
+				getgenv().SelectedBlock = GetBlockFromPlayer(Block)
+			end
+		end)
+	end
+
+	return OldNamecall(self, ...)
+end)
+
+local function PrintBlocks(Start, End, Block)
+	function Stopped(Reason)
+		game:GetService("StarterGui"):SetCore("SendNotification", {
+			Title = "Info"; 
+			Text = "Printing Blocks " .. Reason; 
+			Duration = 5;
+		})
+        SelectedBlock:Set("Selected Block: N/A")
+        TotalBlocksNeeded:Set("Total Blocks Needed: N/A")
+        TotalBlocksLeft:Set("Total Blocks Left: N/A")
+        EstimatedPrintingTime:Set("Estimated Printing Time: N/A")
+
+        SetStartBlockButton:Set("Set Start Block")
+        SetEndBlockButton:Set("Set End Block")
+
+		for i,v in pairs(Container:GetChildren()) do
+			v:Destroy()
+		end
+
+		getgenv().SelectedBlock = nil
+		getgenv().PrintingBlocks = nil
+		getgenv().StartBlock = nil
+		getgenv().EndBlock = nil
+	end
+
+	local BlockCount = 0
+	local BlockDistance = tonumber(getgenv().PlacingDistance) or 3
+
+	for X = math.min(Start.Position.X, End.Position.X), math.max(Start.Position.X, End.Position.X), BlockDistance do
+		for Y = math.min(Start.Position.Y, End.Position.Y), math.max(Start.Position.Y, End.Position.Y), BlockDistance do
+			for Z = math.min(Start.Position.Z, End.Position.Z), math.max(Start.Position.Z, End.Position.Z), BlockDistance do
+				BlockCount += 1
+
+                TotalBlocksNeeded:Set("Total Blocks Needed: " .. BlockCount)
+			end
+		end
+	end
+
+	if Block.Amount.Value < BlockCount then
+		Stopped("Is Stopped Because Not Enough Blocks. You Need " .. BlockCount .. " " .. Block.DisplayName.Value .. "'s")
+		return
+	end
+
+	for X = math.min(Start.Position.X, End.Position.X), math.max(Start.Position.X, End.Position.X), BlockDistance do
+		if not getgenv().PrintingBlocks then Stopped("Is Stopped") return end
+		for Y = math.min(Start.Position.Y, End.Position.Y), math.max(Start.Position.Y, End.Position.Y), BlockDistance do
+			if not getgenv().PrintingBlocks then Stopped("Is Stopped") return end
+			for Z = math.min(Start.Position.Z, End.Position.Z), math.max(Start.Position.Z, End.Position.Z), BlockDistance do
+				if not getgenv().PrintingBlocks then Stopped("Is Stopped") return end
+				local HumanoidRootPart = game:GetService("Players").LocalPlayer.Character:WaitForChild("HumanoidRootPart", math.huge)
+				local OldTick = tick()
+
+				local PlacingConfig = {
+					["upperBlock"] = false,
+					["cframe"] = CFrame.new(Vector3.new(X, Y, Z), Vector3.new(0, 0, -1)),
+					["player_tracking_category"] = "join_from_web",
+					["blockType"] = Block.Name
+				}
+
+				if (HumanoidRootPart.Position - PlacingConfig.cframe.Position).Magnitude >= 84 then -- MAX RANGE = 90
+					tp(PlacingConfig.cframe + Vector3.new(0, 6.5, 0))
+				end
+
+				if getgenv().PlaceBlockFastMode then
+					task.spawn(function()
+						xpcall(function()
+							RemotesStorage.CLIENT_BLOCK_PLACE_REQUEST:InvokeServer(PlacingConfig)
+
+						end, function()
+							warn("An error occurred while trying to print block")
+						end)
+					end)
+				else
+					xpcall(function()
+						RemotesStorage.CLIENT_BLOCK_PLACE_REQUEST:InvokeServer(PlacingConfig)
+					end, function()
+						warn("An error occurred while trying to print block")
+					end)
+				end
+
+				task.wait()
+
+				BlockCount -= 1
+                TotalBlocksLeft:Set("Total Blocks Left: " .. BlockCount)
+                EstimatedPrintingTime:Set("Estimated Printing Time: " .. math.ceil((tick() - OldTick) * BlockCount) .. " Second(s)")
+			end
+		end
+	end
+
+	Stopped("Is Finished Successfuly")
+	return true
+end
+
+local iwss = false
+getgenv().SetStartBlockButton = BlockPrinter:CreateButton({
+    Name = "Set Start Block",
+    Callback = function()
+        if Container:FindFirstChild("Start") then
+            getgenv().StartBlock = nil
+            Container.Start:Destroy()
+            SetStartBlockButton:Set("Set Start Block")
+            getgenv().SelectedBlock = nil
+            SelectedBlock:Set("Selected Block: N/A")
+            TotalBlocksNeeded:Set("Total Blocks Needed: N/A")
+    
+            return
+        end
+    
+        if not iwss and not getgenv().LookingForEndBlock then
+            iwss = true
+            SetStartBlockButton:Set("Place A Block To Set It As Start Block")
+            getgenv().LookingForStartBlock = true
+            getgenv().StartBlock = nil
+    
+            repeat 
+                task.wait(0.1)
+            until
+            getgenv().StartBlock
+    
+            if getgenv().EndBlock and not Container:FindFirstChild(getgenv().EndBlock.Name) then
+                local ClonedEndBlock = getgenv().EndBlock:Clone()
+                ClonedEndBlock.Name = "End"
+                local ClonedStartBlock = getgenv().StartBlock:Clone()
+                ClonedStartBlock.Name = "Start"
+    
+                ClonedEndBlock.Parent = Container
+                ClonedStartBlock.Parent = Container
+    
+                local BlockCount = 0
+                local Start = getgenv().StartBlock
+                local End = getgenv().EndBlock
+                for X = math.min(Start.Position.X, End.Position.X), math.max(Start.Position.X, End.Position.X), 3 do
+                    for Y = math.min(Start.Position.Y, End.Position.Y), math.max(Start.Position.Y, End.Position.Y), 3 do
+                        for Z = math.min(Start.Position.Z, End.Position.Z), math.max(Start.Position.Z, End.Position.Z), 3 do
+                            BlockCount += 1
+                            TotalBlocksNeeded:Set("Total Blocks Needed: " .. BlockCount)
+                        end
+                    end
+                end
+            end
+    
+            SetStartBlockButton:Set("Block Found!")
+            SelectedBlock:Set("Selected Block: " .. getgenv().SelectedBlock.DisplayName.Value)
+            task.wait(0.75)
+            SetStartBlockButton:Set("Set Start Block: Start Block Is Set")
+    
+            iwss = false
+        end
+    end,
+})
+local iwse = false
+getgenv().SetEndBlockButton = BlockPrinter:CreateButton({
+    Name = "Set End Block",
+    Callback = function()
+        if Container:FindFirstChild("End") then
+            getgenv().EndBlock = nil
+            Container.End:Destroy()
+            SetEndBlockButton:Set("Set End Block")
+            getgenv().SelectedBlock = nil
+            SelectedBlock:Set("Selected Block: N/A")
+            TotalBlocksNeeded:Set("Total Blocks Needed: N/A")
+    
+            return
+        end
+    
+        if not iwse and not getgenv().LookingForStartBlock then
+            iwse = true
+
+            SetEndBlockButton:Set("Place A Block To Set It As End Block")
+            getgenv().LookingForEndBlock = true
+            getgenv().EndBlock = nil
+    
+            repeat
+                task.wait(0.1)
+            until
+            getgenv().EndBlock
+    
+            if getgenv().StartBlock and not Container:FindFirstChild(getgenv().StartBlock.Name) then
+                local ClonedEndBlock = getgenv().EndBlock:Clone()
+                ClonedEndBlock.Name = "End"
+                local ClonedStartBlock = getgenv().StartBlock:Clone()
+                ClonedStartBlock.Name = "Start"
+    
+                ClonedEndBlock.Parent = Container
+                ClonedStartBlock.Parent = Container
+    
+                local BlockCount = 0
+                local Start = getgenv().StartBlock
+                local End = getgenv().EndBlock
+                for X = math.min(Start.Position.X, End.Position.X), math.max(Start.Position.X, End.Position.X), 3 do
+                    for Y = math.min(Start.Position.Y, End.Position.Y), math.max(Start.Position.Y, End.Position.Y), 3 do
+                        for Z = math.min(Start.Position.Z, End.Position.Z), math.max(Start.Position.Z, End.Position.Z), 3 do
+                            BlockCount += 1
+                            TotalBlocksNeeded:Set("Total Blocks Needed: " .. BlockCount)
+                        end
+                    end
+                end
+            end
+    
+            SetEndBlockButton:Set("Block Found!")
+            SelectedBlock:Set("Selected Block: " .. getgenv().SelectedBlock.DisplayName.Value)
+            task.wait(0.75)
+            SetEndBlockButton:Set("Set End Block: End Block Is Set")
+    
+            iwse = false
+        end
+    end,
+})
+
+-- local Toggle = BlockPrinter:CreateToggle({
+-- 	Name = "Destroy Blocks",
+-- 	CurrentValue = false,
+-- 	Flag = "Destroy_Blocks", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+-- 	Callback = function(value)
+-- 		getgenv().DestroyBlocks = value
+-- 		task.spawn(function()
+-- 			while task.wait() do
+-- 				for i,v in pairs(PlayerIsland.Blocks:GetChildren()) do
+-- 					if v.Name ==  then
+-- 						game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame + Vector3.new(0,5,0)
+-- 						BlockHitFunction:InvokeServer({["block"] = v})
+-- 					end
+-- 				end
+-- 			end
+-- 		end)
+-- 	end,
+-- })
+
+local isnpb = false
+getgenv().PrintBlock = BlockPrinter:CreateButton({
+    Name = "Print Blocks",
+    Callback = function()
+        task.spawn(function()
+            if not getgenv().PrintingBlocks then
+                if (getgenv().StartBlock and getgenv().EndBlock) then
+                    getgenv().PrintingBlocks = true
+    
+                    game:GetService("StarterGui"):SetCore("SendNotification", {
+                        Title = "Info!"; 
+                        Text = "Attempting To Print Blocks.."; 
+                        Duration = 5;
+                    })
+    
+                    local Success = PrintBlocks(getgenv().StartBlock, getgenv().EndBlock, getgenv().SelectedBlock)
+    
+                    if Success then
+    
+                    end
+    
+                elseif getgenv().StartBlock and (not getgenv().EndBlock) then
+                    if not isnpb then
+                        isnpb = true
+                        PrintBlock:Set("Error: Start Block And End Block Is Not Set!")
+                        task.wait(1)
+                        PrintBlock:Set("Print Blocks")
+                        isnpb = false
+                    end
+                elseif (not getgenv().StartBlock) and getgenv().EndBlock then
+                    if not isnpb then
+                        isnpb = true
+                        PrintBlock:Set("Error: Start Block And End Block Is Not Set!")
+                        task.wait(1)
+                        PrintBlock:Set("Print Blocks")
+                        isnpb = false
+                    end
+                elseif (not getgenv().StartBlock) and (not getgenv().EndBlock) then
+                    if not isnpb then
+                        isnpb = true
+                        PrintBlock:Set("Error: Start Block And End Block Is Not Set!")
+                        task.wait(1)
+                        PrintBlock:Set("Print Blocks")
+                        isnpb = false
+                    end
+                end
+            else
+                if not isnpb then
+                    isnpb = true
+                    PrintBlock:Set("Error: Already Printing Blocks")
+                    task.wait(1)
+                    PrintBlock:Set("Print Blocks")
+                    isnpb = false
+                end
+            end
+        end)
+    end,
+})
+
+local isnsp = false
+getgenv().StopPrinting = BlockPrinter:CreateButton({
+    Name = "Stop Printing",
+    Callback = function()
+        if getgenv().PrintingBlocks then
+            getgenv().PrintingBlocks = false
+            StopPrinting:Set("Successfuly Stopped Printing!")
+            task.wait(0.65)
+            StopPrinting:Set("Stop Printing")
+        else
+            if not isnsp then
+                isnsp = true
+                StopPrinting:Set("Not Printing Blocks!")
+                task.wait(0.65)
+                StopPrinting:Set("Stop Printing")
+                isnsp = false
+            end
+        end
+    end,
+})
+
+local Toggle = BlockPrinter:CreateToggle({
+    Name = "Fast Place",
+    CurrentValue = false,
+    Flag = "Fast_Place", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+    Callback = function(value)
+        getgenv().PlaceBlockFastMode = value
+    end,
+})
+
+-- SettingsPage
+local islands = {}
+local jhzdxj
+for i,v in pairs(workspace.Islands:GetChildren()) do
+	table.insert(islands,tostring(v))
+	jhzdxj = tostring(v)
+end
+task.spawn(function()
+	while task.wait(1) do
+		workspace.Islands.ChildAdded:Connect(function(added)
+			table.clear(islands)
+			table.insert(islands,tostring(jhzdxj))
+		end)
+		workspace.Islands.ChildRemoved:Connect(function(removed)
+			table.clear(islands)
+			table.insert(islands,tostring(jhzdxj))
+		end)
+	end
+end)
+
+local Section = SettingsPage:CreateSection("Settings")
+
+local Dropdown = SettingsPage:CreateDropdown({
+	Name = "Island Selection",
+	Options = islands,
+	CurrentOption = "",
+	Flag = "Select_Island", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Callback = function(value)
+		for i,v in pairs(workspace:GetDescendants()) do
+			if v.Name == value then
+				PlayerIsland = v
+			end
+		end
+	end,
+})
+
+local Button = SettingsPage:CreateButton({
+	Name = "Stop Game Rendering",
+	Callback = function()
+		game:GetService("RunService"):Set3dRenderingEnabled(false) 
+	end,
+ })
+
+local Button = SettingsPage:CreateButton({
+	Name = "Enable Game Rendering",
+	Callback = function()
+		game:GetService("RunService"):Set3dRenderingEnabled(true) 
+	end,
+ })
