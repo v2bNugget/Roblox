@@ -193,7 +193,7 @@ local Button = HomePage:CreateButton({
 			Body = HttpService:JSONEncode({
 				cmd = "INVITE_BROWSER",
 				args = {
-					code = "lottery",
+					code = "zolo",
 				},
 				nonce = HttpService:GenerateGUID(false)
 			}),
